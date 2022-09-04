@@ -1,0 +1,13 @@
+[package]
+name = "EzNES-2"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+imgui = "*"
+winit = "*"
+imgui-winit-support = "*"
+glium = "<0.31"
+imgui-glium-renderer = "*"
