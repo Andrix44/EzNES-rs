@@ -1,4 +1,5 @@
-#![allow(non_snake_case)]
+mod cpu;
+use cpu::CPU;
 
 use imgui::{self, MenuItem};
 use glium::{glutin, Surface};
@@ -42,6 +43,10 @@ struct State {
 }
 
 fn main() {
+    let mut cpu = CPU::new();
+    cpu.run_rom("./ROMS/nestest.nes");
+    return ();
+
     let (event_loop, display, mut ctx, mut platform, mut renderer) = init();
 
     let mut state = State{
