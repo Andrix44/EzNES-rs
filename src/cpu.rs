@@ -2,6 +2,7 @@ use self::instructions::get_instr;
 
 mod instructions;
 
+#[derive(PartialEq)]
 enum AddressingModes {
     Implicit,
     Accumulator,
@@ -23,10 +24,28 @@ struct Flags {
     zero: bool,
     interrupt_disable: bool,
     decimal_mode: bool,
-    break_command: bool,
+    breakfl: bool,
     unused: bool,
     overflow: bool,
     negative: bool,
+}
+
+impl Flags {
+    pub fn get_u8(&self) -> u8 {
+        (self.carry as u8) + (self.zero as u8) << 1 + (self.interrupt_disable as u8) << 2 + (self.decimal_mode as u8) << 3 +
+        (self.breakfl as u8) << 4 + (self.unused as u8) << 5 + (self.overflow as u8) << 6 + (self.negative as u8) << 7
+    }
+
+    pub fn set_u8(&mut self, data: u8) {
+        self.carry = (data >> 0) & 1 == 1;
+        self.zero = (data >> 1) & 1 == 1;
+        self.interrupt_disable = (data >> 2) & 1 == 1;
+        self.decimal_mode = (data >> 3) & 1 == 1;
+        self.breakfl = (data >> 4) & 1 == 1;
+        self.unused = (data >> 5) & 1 == 1;
+        self.overflow = (data >> 6) & 1 == 1;
+        self.negative = (data >> 7) & 1 == 1;
+    }
 }
 
 pub struct CPU {
@@ -54,7 +73,7 @@ impl CPU {
                 zero: false,
                 interrupt_disable: true,
                 decimal_mode: true,
-                break_command: false,
+                breakfl: false,
                 unused: false,
                 overflow: false,
                 negative: false,
@@ -118,9 +137,30 @@ impl CPU {
         }
     }
 
+    // also returns whether a page was crossed or not (for cycle calculation)
     fn get_data(&self, mode: &AddressingModes) -> (u8, bool) {
         let (addr, page_crossed) = self.get_operand_addr(&mode);
         (self.mem[addr as usize], page_crossed)
+    }
+
+    fn do_relative_jump(&mut self) {
+        let mut page_crossed: bool;
+        (self.pc, page_crossed) = self.get_operand_addr(&AddressingModes::Relative);
+        self.pc_autoincrement = false;      
+        self.cycles += 1;
+        if page_crossed {
+            self.cycles += 1;
+        }
+    }
+
+    fn push(&mut self, data: u8) {
+        self.mem[self.sp as usize + 0x100] = data;
+        self.sp -= 1;
+    }
+
+    fn pop(&mut self) -> u8 {
+        self.sp += 1;
+        self.mem[self.sp as usize + 0x100]
     }
 
     fn run(&mut self){

@@ -28,47 +28,46 @@ const instr_list: [InstrEntry; 151] = [
     InstrEntry {name: "AND", handler: CPU::and, opcode: 0x21, mode: AddressingModes::IndexedIndirect, len: 2, cycles: 6},
     InstrEntry {name: "AND", handler: CPU::and, opcode: 0x31, mode: AddressingModes::IndirectIndexed, len: 2, cycles: 5},
     
-    InstrEntry {name: "ASL", opcode: 0x0a, mode: AddressingModes::Accumulator, len: 1, cycles: 2},
-    InstrEntry {name: "ASL", opcode: 0x06, mode: AddressingModes::ZeroPage, len: 2, cycles: 5},
-    InstrEntry {name: "ASL", opcode: 0x16, mode: AddressingModes::ZeroPageX, len: 2, cycles: 6},
-    InstrEntry {name: "ASL", opcode: 0x0e, mode: AddressingModes::Absolute, len: 3, cycles: 6},
-    InstrEntry {name: "ASL", opcode: 0x1e, mode: AddressingModes::AbsoluteX, len: 3, cycles: 7},
+    InstrEntry {name: "ASL", handler: CPU::asl, opcode: 0x0a, mode: AddressingModes::Accumulator, len: 1, cycles: 2},
+    InstrEntry {name: "ASL", handler: CPU::asl, opcode: 0x06, mode: AddressingModes::ZeroPage, len: 2, cycles: 5},
+    InstrEntry {name: "ASL", handler: CPU::asl, opcode: 0x16, mode: AddressingModes::ZeroPageX, len: 2, cycles: 6},
+    InstrEntry {name: "ASL", handler: CPU::asl, opcode: 0x0e, mode: AddressingModes::Absolute, len: 3, cycles: 6},
+    InstrEntry {name: "ASL", handler: CPU::asl, opcode: 0x1e, mode: AddressingModes::AbsoluteX, len: 3, cycles: 7},
     
-    InstrEntry {name: "BCC", opcode: 0x90, mode: AddressingModes::Relative, len: 2, cycles: 2},
-    InstrEntry {name: "BCS", opcode: 0xb0, mode: AddressingModes::Relative, len: 2, cycles: 2},
+    InstrEntry {name: "BCC", handler: CPU::bcc, opcode: 0x90, mode: AddressingModes::Relative, len: 2, cycles: 2},
+    InstrEntry {name: "BCS", handler: CPU::bcs, opcode: 0xb0, mode: AddressingModes::Relative, len: 2, cycles: 2},
     
-    InstrEntry {name: "BNE", opcode: 0xd0, mode: AddressingModes::Relative, len: 2, cycles: 2},
-    InstrEntry {name: "BEQ", opcode: 0xf0, mode: AddressingModes::Relative, len: 2, cycles: 2},
+    InstrEntry {name: "BNE", handler: CPU::bne, opcode: 0xd0, mode: AddressingModes::Relative, len: 2, cycles: 2},
+    InstrEntry {name: "BEQ", handler: CPU::beq, opcode: 0xf0, mode: AddressingModes::Relative, len: 2, cycles: 2},
     
-    InstrEntry {name: "BIT", opcode: 0x24, mode: AddressingModes::ZeroPage, len: 2, cycles: 3},
-    InstrEntry {name: "BIT", opcode: 0x2c, mode: AddressingModes::Absolute, len: 3, cycles: 4},
+    InstrEntry {name: "BIT", handler: CPU::bit, opcode: 0x24, mode: AddressingModes::ZeroPage, len: 2, cycles: 3},
+    InstrEntry {name: "BIT", handler: CPU::bit, opcode: 0x2c, mode: AddressingModes::Absolute, len: 3, cycles: 4},
     
-    InstrEntry {name: "BPL", opcode: 0x10, mode: AddressingModes::Relative, len: 2, cycles: 2},
-    InstrEntry {name: "BMI", opcode: 0x30, mode: AddressingModes::Relative, len: 2, cycles: 2},
+    InstrEntry {name: "BPL", handler: CPU::bpl, opcode: 0x10, mode: AddressingModes::Relative, len: 2, cycles: 2},
+    InstrEntry {name: "BMI", handler: CPU::bmi, opcode: 0x30, mode: AddressingModes::Relative, len: 2, cycles: 2},
     
-    InstrEntry {name: "BRK", opcode: 0x00, mode: AddressingModes::Implicit, len: 1, cycles: 7},
+    InstrEntry {name: "BRK", handler: CPU::brk, opcode: 0x00, mode: AddressingModes::Implicit, len: 1, cycles: 7},
     
-    InstrEntry {name: "BVC", opcode: 0x50, mode: AddressingModes::Relative, len: 2, cycles: 2},
-    InstrEntry {name: "BVS", opcode: 0x70, mode: AddressingModes::Relative, len: 2, cycles: 2},
+    InstrEntry {name: "BVC", handler: CPU::bvc, opcode: 0x50, mode: AddressingModes::Relative, len: 2, cycles: 2},
+    InstrEntry {name: "BVS", handler: CPU::bvs, opcode: 0x70, mode: AddressingModes::Relative, len: 2, cycles: 2},
     
-    InstrEntry {name: "CLC", opcode: 0x18, mode: AddressingModes::Implicit, len: 1, cycles: 2},
-    InstrEntry {name: "CLD", opcode: 0xd8, mode: AddressingModes::Implicit, len: 1, cycles: 2},
+    InstrEntry {name: "CLC", handler: CPU::clc, opcode: 0x18, mode: AddressingModes::Implicit, len: 1, cycles: 2},
+    InstrEntry {name: "CLD", handler: CPU::cld, opcode: 0xd8, mode: AddressingModes::Implicit, len: 1, cycles: 2},
+    InstrEntry {name: "CLI", handler: CPU::cli, opcode: 0x58, mode: AddressingModes::Implicit, len: 1, cycles: 2},
+    InstrEntry {name: "CLV", handler: CPU::clv, opcode: 0xb8, mode: AddressingModes::Implicit, len: 1, cycles: 2},
     
-    InstrEntry {name: "CLI", opcode: 0x58, mode: AddressingModes::Implicit, len: 1, cycles: 2},
-    InstrEntry {name: "CLV", opcode: 0xb8, mode: AddressingModes::Implicit, len: 1, cycles: 2},
+    InstrEntry {name: "CMD", handler: CPU::cmp, opcode: 0xc9, mode: AddressingModes::Immediate, len: 2, cycles: 2},
+    InstrEntry {name: "CMD", handler: CPU::cmp, opcode: 0xc5, mode: AddressingModes::ZeroPage, len: 2, cycles: 3},
+    InstrEntry {name: "CMD", handler: CPU::cmp, opcode: 0xd5, mode: AddressingModes::ZeroPageX, len: 2, cycles: 4},
+    InstrEntry {name: "CMD", handler: CPU::cmp, opcode: 0xcd, mode: AddressingModes::Absolute, len: 3, cycles: 4},
+    InstrEntry {name: "CMD", handler: CPU::cmp, opcode: 0xdd, mode: AddressingModes::AbsoluteX, len: 3, cycles: 4},
+    InstrEntry {name: "CMD", handler: CPU::cmp, opcode: 0xd9, mode: AddressingModes::AbsoluteY, len: 3, cycles: 4},
+    InstrEntry {name: "CMD", handler: CPU::cmp, opcode: 0xc1, mode: AddressingModes::IndexedIndirect, len: 2, cycles: 6},
+    InstrEntry {name: "CMD", handler: CPU::cmp, opcode: 0xd1, mode: AddressingModes::IndirectIndexed, len: 2, cycles: 5},
     
-    InstrEntry {name: "CMD", opcode: 0xc9, mode: AddressingModes::Immediate, len: 2, cycles: 2},
-    InstrEntry {name: "CMD", opcode: 0xc5, mode: AddressingModes::ZeroPage, len: 2, cycles: 3},
-    InstrEntry {name: "CMD", opcode: 0xd5, mode: AddressingModes::ZeroPageX, len: 2, cycles: 4},
-    InstrEntry {name: "CMD", opcode: 0xcd, mode: AddressingModes::Absolute, len: 3, cycles: 4},
-    InstrEntry {name: "CMD", opcode: 0xdd, mode: AddressingModes::AbsoluteX, len: 3, cycles: 4},
-    InstrEntry {name: "CMD", opcode: 0xd9, mode: AddressingModes::AbsoluteY, len: 3, cycles: 4},
-    InstrEntry {name: "CMD", opcode: 0xc1, mode: AddressingModes::IndexedIndirect, len: 2, cycles: 6},
-    InstrEntry {name: "CMD", opcode: 0xd1, mode: AddressingModes::IndirectIndexed, len: 2, cycles: 5},
-    
-    InstrEntry {name: "CPX", opcode: 0xe0, mode: AddressingModes::Immediate, len: 2, cycles: 2},
-    InstrEntry {name: "CPX", opcode: 0xe4, mode: AddressingModes::ZeroPage, len: 2, cycles: 3},
-    InstrEntry {name: "CPX", opcode: 0xec, mode: AddressingModes::Absolute, len: 3, cycles: 4},
+    InstrEntry {name: "CPX", handler: CPU::cpx, opcode: 0xe0, mode: AddressingModes::Immediate, len: 2, cycles: 2},
+    InstrEntry {name: "CPX", handler: CPU::cpx, opcode: 0xe4, mode: AddressingModes::ZeroPage, len: 2, cycles: 3},
+    InstrEntry {name: "CPX", handler: CPU::cpx, opcode: 0xec, mode: AddressingModes::Absolute, len: 3, cycles: 4},
     
     InstrEntry {name: "CPY", opcode: 0xc0, mode: AddressingModes::Immediate, len: 2, cycles: 2},
     InstrEntry {name: "CPY", opcode: 0xc4, mode: AddressingModes::ZeroPage, len: 2, cycles: 3},
@@ -236,4 +235,129 @@ impl CPU {
             self.cycles += 1
         };
     }
+
+    fn asl(&mut self, mode: &AddressingModes) {
+        match mode {
+            AddressingModes::Accumulator => {
+                let data = self.A;
+                self.flags.carry = data >> 7 == 1;
+                self.A = data << 1;
+                self.flags.zero = self.A == 0;
+                self.flags.negative = self.A >> 7 == 1;
+            }
+            _ => {
+                let (addr, _) = self.get_operand_addr(mode);
+                let data = self.mem[addr as usize];
+                self.flags.carry = data >> 7 == 1;
+                self.mem[addr as usize] = data << 1;
+                self.flags.zero = self.mem[addr as usize] == 0;
+                self.flags.negative = self.mem[addr as usize] >> 7 == 1;
+            }
+        }
+    }
+
+    fn bcc(&mut self, _mode: &AddressingModes) {
+        if !self.flags.carry {
+            self.do_relative_jump();
+        }
+    }
+
+    fn bcs(&mut self, _mode: &AddressingModes) {
+        if self.flags.carry {
+            self.do_relative_jump();
+        }
+    }
+
+    fn beq(&mut self, _mode: &AddressingModes) {
+        if self.flags.zero {
+            self.do_relative_jump();
+        }
+    }
+
+    fn bne(&mut self, _mode: &AddressingModes) {
+        if !self.flags.zero {
+            self.do_relative_jump();
+        }
+    }
+
+    fn bit(&mut self, mode: &AddressingModes) {
+        let (data, _) = self.get_data(mode);
+        self.flags.zero = self.A & data == 0;
+        self.flags.overflow = data >> 7 == 1;
+        self.flags.negative = (data >> 6) & 1 == 1;
+    }
+
+    fn bmi(&mut self, _mode: &AddressingModes) {
+        if self.flags.negative {
+            self.do_relative_jump();
+        }
+    }
+
+    fn bpl(&mut self, _mode: &AddressingModes) {
+        if !self.flags.negative {
+            self.do_relative_jump();
+        }
+    }
+
+    fn brk(&mut self, _mode: &AddressingModes) {
+        self.push((self.pc + 1 & 0xff) as u8); // different sources say Different things about this instruction
+        self.push((self.pc + 1 >> 8) as u8);
+
+        self.flags.breakfl = true;
+        //self.flags.interrupt_disable = true;
+        self.push(self.flags.get_u8());
+
+        self.pc = self.read_mem_u16(0xfffe);
+
+        self.pc_autoincrement = false;
+    }
+
+    fn bvs(&mut self, _mode: &AddressingModes) {
+        if self.flags.overflow {
+            self.do_relative_jump();
+        }
+    }
+
+    fn bvc(&mut self, _mode: &AddressingModes) {
+        if !self.flags.overflow {
+            self.do_relative_jump();
+        }
+    }
+
+    fn clc(&mut self, _mode: &AddressingModes) {
+        self.flags.carry = false;
+    }
+
+    fn cld(&mut self, _mode: &AddressingModes) {
+        self.flags.decimal_mode = false;
+    }
+
+    fn cli(&mut self, _mode: &AddressingModes) {
+        self.flags.interrupt_disable = false;
+    }
+
+    fn clv(&mut self, _mode: &AddressingModes) {
+        self.flags.overflow = false;
+    }
+
+    fn cmp(&mut self, mode: &AddressingModes) {
+        let (data, page_crossed) = self.get_data(mode);
+
+        self.flags.carry = self.A >= data;
+        self.flags.carry = self.A == data;
+        self.flags.negative = (self.A - data) >> 7 == 1;
+
+        if page_crossed {
+            self.cycles += 1;
+        }
+    }
+
+    fn cpx(&mut self, mode: &AddressingModes) {
+        let (data, _) = self.get_data(mode);
+
+        self.flags.carry = self.X >= data;
+        self.flags.carry = self.X == data;
+        self.flags.negative = (self.X - data) >> 7 == 1;
+    }
+    
 }
