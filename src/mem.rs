@@ -1,35 +1,35 @@
-use std::ops::{Index, IndexMut};
+mod nrom;
 
-enum Mirroring {
+pub enum Mirroring {
     Vertical,
     Horizontal,
 }
 
-enum ConsoleType {
+pub enum ConsoleType {
     NesFamicom,
     VsSystem,
     Playchoice,
     Extended,
 }
 
-enum Region {
+pub enum Region {
     NTSC,
     PAL,
 }
 
-struct Header {
-    version2: bool, // Unimplemented
-    prg_ram_size: u16,
-    prg_rom_size: u16,
-    chr_ram_size: u16,
-    chr_rom_size: u16,
-    mirroring: Mirroring,
-    prg_ram_battery: bool,
-    trainer: bool,
-    ignore_mirroring: bool,
-    mapper: u8,
-    console_type: ConsoleType,
-    region: Region,
+pub struct Header {
+    pub version2: bool, // Unimplemented
+    pub prg_ram_size: u16,
+    pub prg_rom_size: u16,
+    pub chr_ram_size: u16,
+    pub chr_rom_size: u16,
+    pub mirroring: Mirroring,
+    pub prg_ram_battery: bool,
+    pub trainer: bool,
+    pub ignore_mirroring: bool,
+    pub mapper: u8,
+    pub console_type: ConsoleType,
+    pub region: Region,
 }
 
 pub fn parse_header(header_bytes: [u8; 16]) ->  Result<Header, &'static str> {
@@ -45,7 +45,8 @@ pub fn parse_header(header_bytes: [u8; 16]) ->  Result<Header, &'static str> {
     };
     let mirroring = match header_bytes[6] & 1 {
         0 => Mirroring::Horizontal,
-        1 => Mirroring::Vertical
+        1 => Mirroring::Vertical,
+        _ => unreachable!()
     };
     let prg_ram_battery = header_bytes[6] & 2 != 0;
     let trainer = header_bytes[6] & 4 != 0;
@@ -58,12 +59,14 @@ pub fn parse_header(header_bytes: [u8; 16]) ->  Result<Header, &'static str> {
             0 => ConsoleType::NesFamicom,
             1 => ConsoleType::VsSystem,
             2 => ConsoleType::Playchoice,
-            3 => ConsoleType::Extended
+            3 => ConsoleType::Extended,
+            _ => unreachable!()
         };
         let prg_ram_size = std::cmp::max(header_bytes[8] as u16 * 0x2000, 0x2000);
         let region = match header_bytes[9] & 1 {
             0 => Region::NTSC,
-            1 => Region::PAL
+            1 => Region::PAL,
+            _ => unreachable!()
         };
 
         Ok(Header {
@@ -92,36 +95,67 @@ pub fn parse_header(header_bytes: [u8; 16]) ->  Result<Header, &'static str> {
 
 }
 
-pub struct Memory {
-    header: Header,
-    cpu_mem: Vec<u8>,
-    prg_mem: Vec<u8>,
-    chr_mem: Vec<u8>,
-    cpu_ram: Vec<u8>,
+trait Mapper {
+    fn translate_address(&self, addr: usize) -> usize;
 }
 
-impl Memory {
-    pub fn new(rom_data: [u8; 16]) -> Self {
-        let header = parse_header(rom_data).unwrap(); // TODO: this should fail silently when the file open dialog is implemented
-        let cpu_mem = vec![0; 0xffff];
-        let prg_mem = vec![0; header.prg_rom_size as usize];
-        let chr_mem = vec![0; header.chr_rom_size as usize];
-        let cpu_ram = vec![0; 0x800];
+pub struct MemoryBus {
+    mem: [u8; 0xffff],
+    mapper: Box<dyn Mapper>
+}
 
-        Memory { header, cpu_mem, prg_mem, chr_mem, cpu_ram }
+impl MemoryBus {
+    pub fn new(header: Header, prg_rom_data: &[u8]) -> Self {
+        let mut mem = [0; 0xffff];
+        mem[0x8000 .. (0x8000 + prg_rom_data.len())].copy_from_slice(&prg_rom_data[..]);
+
+        let mapper = match header.mapper {
+            0 => nrom::Nrom::new(header),
+            _ => unimplemented!()
+        };
+
+        MemoryBus { mem, mapper }
     }
-}
 
-impl Index<usize> for Memory {
-    type Output = u8;
-
-    fn index(&self, index: usize) -> &Self::Output {
-        &self.cpu_mem[index]
+    pub fn read(&self, addr: usize) -> u8 {
+        if addr < 0x2000 {
+            self.mem[addr & 0x7ff]
+        }
+        else if addr < 0x4000 {
+            self.mem[addr & 7]
+        }
+        else if addr < 0x4016 {
+            self.mem[addr]
+        }
+        else if addr < 0x4018 {
+            self.mem[addr]
+        }
+        else if addr < 0x8000 {
+            self.mem[addr]
+        }
+        else {
+            self.mem[self.mapper.translate_address(addr)]
+        }
     }
-}
 
-impl IndexMut<usize> for Memory {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        &mut self.cpu_mem[index]
+    pub fn write(&mut self, addr: usize, data: u8) {
+        if addr < 0x2000 {
+            self.mem[addr & 0x7ff] = data
+        }
+        else if addr < 0x4000 {
+            self.mem[addr & 7] = data
+        }
+        else if addr < 0x4016 {
+            self.mem[addr] = data
+        }
+        else if addr < 0x4018 {
+            self.mem[addr] = data
+        }
+        else if addr < 0x8000 {
+            self.mem[addr] = data
+        }
+        else {
+            self.mem[self.mapper.translate_address(addr)] = data
+        }
     }
 }

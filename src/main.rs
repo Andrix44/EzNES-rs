@@ -1,6 +1,8 @@
 mod cpu;
 use cpu::CPU;
 
+mod mem;
+
 use imgui::{self, MenuItem};
 use glium::{glutin, Surface};
 use imgui_glium_renderer::Renderer;
@@ -43,8 +45,8 @@ struct State {
 }
 
 fn main() {
-    let mut cpu = CPU::new();
-    cpu.run_rom("./ROMS/nestest.nes");
+    let mut cpu = CPU::new("./ROMS/nestest.nes");
+    cpu.run();
     return ();
 
     let (event_loop, display, mut ctx, mut platform, mut renderer) = init();

@@ -1,6 +1,7 @@
 use self::instructions::get_instr;
 
 mod instructions;
+use crate::mem::{MemoryBus, parse_header};
 
 #[derive(PartialEq)]
 pub enum AddressingModes {
@@ -55,43 +56,61 @@ pub struct CPU {
     sp: u8,
     pc: u16,
     flags: Flags,
-    mem: [u8; 0xffff],
+    mem: MemoryBus,
     pc_autoincrement: bool,
     cycles: u64,
 }
 
 impl CPU {
-    pub fn new() -> Self {
+    pub fn new(path: &str) -> Self {
+        let bytes = std::fs::read(path).expect("Error while reading file!");
+        let header = parse_header(bytes[..16].try_into().expect("Input file is shorter than 15 bytes!")).unwrap();
+        let prg_rom_data = if header.trainer {&bytes[16 + 512 .. 16 + 512 + header.prg_rom_size as usize]} 
+                                    else {&bytes[16 .. 16 + header.prg_rom_size as usize]};
+        let mem = MemoryBus::new(header, prg_rom_data);
+        let lo = mem.read(0xfffc);
+        let hi = mem.read(0xfffd);
+        let pc = u16::from_le_bytes([lo, hi]);
+
         CPU {
             a: 0,
             x: 0,
             y: 0,
             sp: 0xfd,
-            pc: 0,
+            pc,
             flags: Flags { // TODO: check that this is 0b00110100
                 carry: false,
                 zero: false,
                 interrupt_disable: true,
-                decimal_mode: true,
-                breakfl: false,
-                unused: false,
+                decimal_mode: false,
+                breakfl: true,
+                unused: true,
                 overflow: false,
                 negative: false,
             },
-            mem: [0; 0xffff],
+            mem,
             pc_autoincrement: false,
             cycles: 0,
         }
     }
 
     fn read_mem(&self, addr: u16) -> u8 {
-        self.mem[addr as usize]
+        self.mem.read(addr as usize)
     }
 
     fn read_mem_u16(&self, addr: u16) -> u16 {
         let lo = self.read_mem(addr);
         let hi = self.read_mem(addr + 1);
         u16::from_le_bytes([lo, hi])
+    }
+
+    fn write_mem(&mut self, addr: u16, data: u8) {
+        self.mem.write(addr as usize, data)
+    }
+
+    fn write_mem_u16(&mut self, addr: u16, data: u16) {
+        self.write_mem(addr, data as u8);
+        self.write_mem(addr + 1, (data >> 8) as u8)
     }
 
     // also returns whether a page was crossed or not (for cycle calculation)
@@ -131,7 +150,7 @@ impl CPU {
     // also returns whether a page was crossed or not (for cycle calculation)
     fn get_data(&self, mode: &AddressingModes) -> (u8, bool) {
         let (addr, page_crossed) = self.get_operand_addr(&mode);
-        (self.mem[addr as usize], page_crossed)
+        (self.read_mem(addr), page_crossed)
     }
 
     fn do_relative_jump(&mut self) {
@@ -145,39 +164,41 @@ impl CPU {
     }
 
     fn push(&mut self, data: u8) {
-        self.mem[self.sp as usize + 0x100] = data;
+        self.write_mem(self.sp as u16 + 0x100, data);
         self.sp -= 1;
     }
 
     fn push16(&mut self, data: u16) {
-        self.mem[self.sp as usize + 0x100] = (data & 0xff) as u8;
-        self.sp -= 1;
-        self.mem[self.sp as usize + 0x100] = ((data >> 8) & 0xff) as u8;
-        self.sp -= 1;
+        self.write_mem_u16(self.sp as u16 - 1 + 0x100, data);
+        self.sp -= 2;
     }
 
     fn pop(&mut self) -> u8 {
         self.sp += 1;
-        self.mem[self.sp as usize + 0x100]
+        self.read_mem(self.sp as u16 + 0x100)
     }
 
     fn pop16(&mut self) -> u16 {
-        let mut ret: u16;
-
-        self.sp += 1;
-        ret = (self.mem[self.sp as usize + 0x100] as u16) << 8;
-        self.sp += 1;
-        ret |= self.mem[self.sp as usize + 0x100] as u16;
-
-        ret
+        self.sp += 2;
+        self.read_mem_u16(self.sp as u16 - 1 + 0x100)
     }
 
-    fn run(&mut self){
+    pub fn run(&mut self){
         loop {
             self.pc_autoincrement = true;
 
             let opcode = self.read_mem(self.pc);
             let instr = get_instr(opcode).expect(format!("Illegal instruction hit: {}", opcode).as_str());
+            /* let op1 = self.read_mem(self.pc + 1).to_string().as_str();
+            let op2 = self.read_mem(self.pc + 2).to_string().as_str();
+            let op = format!("{} {}", op1, op2);
+            let operands = match instr.len - 1 {
+                0 => "",
+                1 => op1,
+                2 => op2,
+                _ => unreachable!()
+            };
+            println!("{} {}", instr.name, operands); */
             println!("{}", instr.name);
             (instr.handler)(self, &instr.mode);
 
@@ -189,20 +210,9 @@ impl CPU {
         }
     }
 
-    fn load_rom(&mut self, path: &str){
-        let bytes = std::fs::read(path).expect("Error while reading file!");
-        self.mem[0x8000 .. (0x8000 + bytes.len())].copy_from_slice(&bytes[..]);
-    }
-
     fn reset(&mut self){
         self.pc = self.read_mem_u16(0xfffc);
         self.sp -= 3;
         self.flags.interrupt_disable = true;
-    }
-
-    pub fn run_rom(&mut self, path: &str){
-        self.load_rom(path);
-        self.reset();
-        self.run();
     }
 }

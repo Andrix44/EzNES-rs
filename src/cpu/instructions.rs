@@ -245,10 +245,10 @@ impl CPU {
         }
         else {
             let (addr, _) = self.get_operand_addr(mode);
-            self.flags.carry = self.mem[addr as usize] >> 7 == 1;
-            self.mem[addr as usize] <<= 1;
-            self.flags.zero = self.mem[addr as usize] == 0;
-            self.flags.negative = self.mem[addr as usize] >> 7 == 1;
+            self.flags.carry = self.read_mem(addr) >> 7 == 1;
+            self.write_mem(addr, self.read_mem(addr) << 1);
+            self.flags.zero = self.read_mem(addr) == 0;
+            self.flags.negative = self.read_mem(addr) >> 7 == 1;
         }
     }
 
@@ -365,10 +365,10 @@ impl CPU {
 
     fn dec(&mut self, mode: &AddressingModes) {
         let (addr, _) = self.get_operand_addr(mode);
-        self.mem[addr as usize] -= 1;
+        self.write_mem(addr, self.read_mem(addr) - 1);
 
-        self.flags.zero = self.mem[addr as usize] == 0;
-        self.flags.negative = self.mem[addr as usize] >> 7 == 1;
+        self.flags.zero = self.read_mem(addr) == 0;
+        self.flags.negative = self.read_mem(addr) >> 7 == 1;
     }
 
     fn dex(&mut self, _mode: &AddressingModes) {
@@ -399,10 +399,10 @@ impl CPU {
 
     fn inc(&mut self, mode: &AddressingModes) {
         let (addr, _) = self.get_operand_addr(mode);
-        self.mem[addr as usize] += 1;
+        self.write_mem(addr, self.read_mem(addr) + 1);
 
-        self.flags.zero = self.mem[addr as usize] == 0;
-        self.flags.negative = self.mem[addr as usize] >> 7 == 1;
+        self.flags.zero = self.read_mem(addr) == 0;
+        self.flags.negative = self.read_mem(addr) >> 7 == 1;
     }
 
     fn inx(&mut self, _mode: &AddressingModes) {
@@ -478,9 +478,9 @@ impl CPU {
         }
         else {
             let (addr, _) = self.get_operand_addr(mode);
-            self.flags.carry = self.mem[addr as usize] & 1 == 1;
-            self.mem[addr as usize] >>= 1;
-            self.flags.zero = self.mem[addr as usize] == 0;
+            self.flags.carry = self.read_mem(addr) & 1 == 1;
+            self.write_mem(addr, self.read_mem(addr) >> 1);
+            self.flags.zero = self.read_mem(addr) == 0;
             self.flags.negative = false;
         }
     }
@@ -543,13 +543,13 @@ impl CPU {
         else {
             let (addr, _) = self.get_operand_addr(mode);
             let bit0 = self.flags.carry;
-            self.flags.carry = self.mem[addr as usize] >> 7 == 1;
-            self.mem[addr as usize] <<= 1;
+            self.flags.carry = self.read_mem(addr) >> 7 == 1;
+            self.write_mem(addr, self.read_mem(addr) << 1);
             if bit0 {
-                self.mem[addr as usize] |= 0b00000001;
+                self.write_mem(addr, self.read_mem(addr) | 0b00000001);
             }
-            self.flags.zero = self.mem[addr as usize] == 0;
-            self.flags.negative = self.mem[addr as usize] >> 7 == 1;
+            self.flags.zero = self.read_mem(addr) == 0;
+            self.flags.negative = self.read_mem(addr) >> 7 == 1;
         }
     }
 
@@ -567,13 +567,13 @@ impl CPU {
         else {
             let (addr, _) = self.get_operand_addr(mode);
             let bit7 = self.flags.carry;
-            self.flags.carry = self.mem[addr as usize] & 1 == 1;
-            self.mem[addr as usize] >>= 1;
+            self.flags.carry = self.read_mem(addr) & 1 == 1;
+            self.write_mem(addr, self.read_mem(addr) >> 1);
             if bit7 {
-                self.mem[addr as usize] |= 0b10000000;
+                self.write_mem(addr, self.read_mem(addr) | 0b10000000);
             }
-            self.flags.zero = self.mem[addr as usize] == 0;
-            self.flags.negative = self.mem[addr as usize] >> 7 == 1;
+            self.flags.zero = self.read_mem(addr) == 0;
+            self.flags.negative = self.read_mem(addr) >> 7 == 1;
         }
     }
 
@@ -620,17 +620,17 @@ impl CPU {
 
     fn sta(&mut self, mode: &AddressingModes) {
         let (addr, _) = self.get_operand_addr(mode);
-        self.mem[addr as usize] = self.a;
+        self.write_mem(addr, self.a);
     }
 
     fn stx(&mut self, mode: &AddressingModes) {
         let (addr, _) = self.get_operand_addr(mode);
-        self.mem[addr as usize] = self.x;
+        self.write_mem(addr, self.x);
     }
 
     fn sty(&mut self, mode: &AddressingModes) {
         let (addr, _) = self.get_operand_addr(mode);
-        self.mem[addr as usize] = self.y;
+        self.write_mem(addr, self.y);
     }
 
     fn tax(&mut self, _mode: &AddressingModes) {
