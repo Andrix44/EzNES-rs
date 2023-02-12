@@ -123,7 +123,7 @@ impl CPU {
             AddressingModes::ZeroPageX => (self.read_mem(self.pc + 1).wrapping_add(self.x) as u16, false),
             AddressingModes::ZeroPageY => (self.read_mem(self.pc + 1).wrapping_add(self.y) as u16, false),
             AddressingModes::Relative => {
-                let ret = (self.pc + 2).wrapping_add_signed(self.read_mem(self.pc + 1) as i16);
+                let ret = (self.pc + 2).wrapping_add_signed(self.read_mem(self.pc + 1) as i8 as i16);
                 (ret, (self.pc >> 8) != (ret >> 8))
             },
             AddressingModes::Absolute => (self.read_mem_u16(self.pc + 1), false),
@@ -188,18 +188,17 @@ impl CPU {
             self.pc_autoincrement = true;
 
             let opcode = self.read_mem(self.pc);
-            let instr = get_instr(opcode).expect(format!("Illegal instruction hit: {}", opcode).as_str());
-            /* let op1 = self.read_mem(self.pc + 1).to_string().as_str();
-            let op2 = self.read_mem(self.pc + 2).to_string().as_str();
-            let op = format!("{} {}", op1, op2);
-            let operands = match instr.len - 1 {
-                0 => "",
-                1 => op1,
-                2 => op2,
+            let instr = get_instr(opcode).expect(format!("Illegal instruction hit: {:x}", opcode).as_str());
+
+            let operands: String;
+            match instr.len - 1 {
+                0 => operands = String::new(),
+                1 => operands = format!("0x{:0>2x}", self.read_mem(self.pc + 1)),
+                2 => operands = format!("0x{:0>2x} 0x{:0>2x}", self.read_mem(self.pc + 1), self.read_mem(self.pc + 2)),
                 _ => unreachable!()
             };
-            println!("{} {}", instr.name, operands); */
-            println!("{}", instr.name);
+            println!("0x{:0>4x}: {} {}", self.pc, instr.name, operands);
+            
             (instr.handler)(self, &instr.mode);
 
             self.cycles += instr.cycles as u64;
