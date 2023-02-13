@@ -56,14 +56,14 @@ const INSTR_LIST: [InstrEntry; 151] = [
     InstrEntry {name: "CLI", handler: CPU::cli, opcode: 0x58, mode: AddressingModes::Implicit, len: 1, cycles: 2},
     InstrEntry {name: "CLV", handler: CPU::clv, opcode: 0xb8, mode: AddressingModes::Implicit, len: 1, cycles: 2},
     
-    InstrEntry {name: "CMD", handler: CPU::cmp, opcode: 0xc9, mode: AddressingModes::Immediate, len: 2, cycles: 2},
-    InstrEntry {name: "CMD", handler: CPU::cmp, opcode: 0xc5, mode: AddressingModes::ZeroPage, len: 2, cycles: 3},
-    InstrEntry {name: "CMD", handler: CPU::cmp, opcode: 0xd5, mode: AddressingModes::ZeroPageX, len: 2, cycles: 4},
-    InstrEntry {name: "CMD", handler: CPU::cmp, opcode: 0xcd, mode: AddressingModes::Absolute, len: 3, cycles: 4},
-    InstrEntry {name: "CMD", handler: CPU::cmp, opcode: 0xdd, mode: AddressingModes::AbsoluteX, len: 3, cycles: 4},
-    InstrEntry {name: "CMD", handler: CPU::cmp, opcode: 0xd9, mode: AddressingModes::AbsoluteY, len: 3, cycles: 4},
-    InstrEntry {name: "CMD", handler: CPU::cmp, opcode: 0xc1, mode: AddressingModes::IndexedIndirect, len: 2, cycles: 6},
-    InstrEntry {name: "CMD", handler: CPU::cmp, opcode: 0xd1, mode: AddressingModes::IndirectIndexed, len: 2, cycles: 5},
+    InstrEntry {name: "CMP", handler: CPU::cmp, opcode: 0xc9, mode: AddressingModes::Immediate, len: 2, cycles: 2},
+    InstrEntry {name: "CMP", handler: CPU::cmp, opcode: 0xc5, mode: AddressingModes::ZeroPage, len: 2, cycles: 3},
+    InstrEntry {name: "CMP", handler: CPU::cmp, opcode: 0xd5, mode: AddressingModes::ZeroPageX, len: 2, cycles: 4},
+    InstrEntry {name: "CMP", handler: CPU::cmp, opcode: 0xcd, mode: AddressingModes::Absolute, len: 3, cycles: 4},
+    InstrEntry {name: "CMP", handler: CPU::cmp, opcode: 0xdd, mode: AddressingModes::AbsoluteX, len: 3, cycles: 4},
+    InstrEntry {name: "CMP", handler: CPU::cmp, opcode: 0xd9, mode: AddressingModes::AbsoluteY, len: 3, cycles: 4},
+    InstrEntry {name: "CMP", handler: CPU::cmp, opcode: 0xc1, mode: AddressingModes::IndexedIndirect, len: 2, cycles: 6},
+    InstrEntry {name: "CMP", handler: CPU::cmp, opcode: 0xd1, mode: AddressingModes::IndirectIndexed, len: 2, cycles: 5},
     
     InstrEntry {name: "CPX", handler: CPU::cpx, opcode: 0xe0, mode: AddressingModes::Immediate, len: 2, cycles: 2},
     InstrEntry {name: "CPX", handler: CPU::cpx, opcode: 0xe4, mode: AddressingModes::ZeroPage, len: 2, cycles: 3},
@@ -159,8 +159,8 @@ const INSTR_LIST: [InstrEntry; 151] = [
     InstrEntry {name: "ROR", handler: CPU::ror, opcode: 0x6e, mode: AddressingModes::Absolute, len: 3, cycles: 6},
     InstrEntry {name: "ROR", handler: CPU::ror, opcode: 0x7e, mode: AddressingModes::AbsoluteX, len: 3, cycles: 7},
     
-    InstrEntry {name: "RTI", handler: CPU::rts, opcode: 0x40, mode: AddressingModes::Implicit, len: 1, cycles: 6},
-    InstrEntry {name: "RTS", handler: CPU::rti, opcode: 0x60, mode: AddressingModes::Implicit, len: 1, cycles: 6},
+    InstrEntry {name: "RTI", handler: CPU::rti, opcode: 0x40, mode: AddressingModes::Implicit, len: 1, cycles: 6},
+    InstrEntry {name: "RTS", handler: CPU::rts, opcode: 0x60, mode: AddressingModes::Implicit, len: 1, cycles: 6},
 
     InstrEntry {name: "SBC", handler: CPU::sbc, opcode: 0xe9, mode: AddressingModes::Immediate, len: 2, cycles: 2},
     InstrEntry {name: "SBC", handler: CPU::sbc, opcode: 0xe5, mode: AddressingModes::ZeroPage, len: 2, cycles: 3},
@@ -296,7 +296,7 @@ impl CPU {
     }
 
     fn brk(&mut self, _mode: &AddressingModes) { // different sources say Different things about this instruction
-        self.push16(self.pc + 1);
+        self.push16(self.pc + 2); // todo: this might be +1
 
         self.flags.breakfl = true;
         //self.flags.interrupt_disable = true;
@@ -340,7 +340,7 @@ impl CPU {
 
         self.flags.carry = self.a >= data;
         self.flags.zero = self.a == data;
-        self.flags.negative = (self.a - data) >> 7 == 1;
+        self.flags.negative = self.a.overflowing_sub(data).1;
 
         if page_crossed {
             self.cycles += 1;
@@ -352,7 +352,7 @@ impl CPU {
 
         self.flags.carry = self.x >= data;
         self.flags.zero = self.x == data;
-        self.flags.negative = (self.x - data) >> 7 == 1;
+        self.flags.negative = self.x.overflowing_sub(data).1;
     }
     
     fn cpy(&mut self, mode: &AddressingModes) {
@@ -360,7 +360,7 @@ impl CPU {
 
         self.flags.carry = self.y >= data;
         self.flags.zero = self.y == data;
-        self.flags.negative = (self.y - data) >> 7 == 1;
+        self.flags.negative = self.y.overflowing_sub(data).1;
     }
 
     fn dec(&mut self, mode: &AddressingModes) {
@@ -372,14 +372,14 @@ impl CPU {
     }
 
     fn dex(&mut self, _mode: &AddressingModes) {
-        self.x -= 1;
+        self.x = self.x.wrapping_sub(1);
 
         self.flags.zero = self.x == 0;
         self.flags.negative = self.x >> 7 == 1;
     }
 
     fn dey(&mut self, _mode: &AddressingModes) {
-        self.y -= 1;
+        self.y = self.y.wrapping_sub(1);
 
         self.flags.zero = self.y == 0;
         self.flags.negative = self.y >> 7 == 1;
@@ -406,14 +406,14 @@ impl CPU {
     }
 
     fn inx(&mut self, _mode: &AddressingModes) {
-        self.x += 1;
+        self.x = self.x.wrapping_add(1);
 
         self.flags.zero = self.x == 0;
         self.flags.negative = self.x >> 7 == 1;
     }
 
     fn iny(&mut self, _mode: &AddressingModes) {
-        self.y += 1;
+        self.y = self.y.wrapping_add(1);
 
         self.flags.zero = self.y == 0;
         self.flags.negative = self.y >> 7 == 1;
@@ -582,6 +582,8 @@ impl CPU {
         self.flags.set_u8(data);
         // breakfl and unused might be ignored ???
         self.pc = self.pop16();
+
+        self.pc_autoincrement = false; // todo: this might be wrong, the bug is probably somewhere else
     }
 
     fn rts(&mut self, _mode: &AddressingModes) {

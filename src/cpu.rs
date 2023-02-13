@@ -68,9 +68,13 @@ impl CPU {
         let prg_rom_data = if header.trainer {&bytes[16 + 512 .. 16 + 512 + header.prg_rom_size as usize]} 
                                     else {&bytes[16 .. 16 + header.prg_rom_size as usize]};
         let mem = MemoryBus::new(header, prg_rom_data);
-        let lo = mem.read(0xfffc);
-        let hi = mem.read(0xfffd);
-        let pc = u16::from_le_bytes([lo, hi]);
+
+        let pc = match path.contains("nestest.nes") {
+            true => 0xc000,
+            false => {let lo = mem.read(0xfffc);
+                      let hi = mem.read(0xfffd);
+                      u16::from_le_bytes([lo, hi])},
+        };
 
         CPU {
             a: 0,
@@ -169,6 +173,7 @@ impl CPU {
     }
 
     fn push16(&mut self, data: u16) {
+        //println!("pushing {:0<4x} at {}", data, self.sp as u16 - 1 + 0x100);
         self.write_mem_u16(self.sp as u16 - 1 + 0x100, data);
         self.sp -= 2;
     }
@@ -179,6 +184,7 @@ impl CPU {
     }
 
     fn pop16(&mut self) -> u16 {
+        //println!("popped {:0<4x} at {}", self.read_mem_u16(self.sp as u16 + 1 + 0x100), self.sp as u16 + 1 + 0x100);
         self.sp += 2;
         self.read_mem_u16(self.sp as u16 - 1 + 0x100)
     }
@@ -188,13 +194,13 @@ impl CPU {
             self.pc_autoincrement = true;
 
             let opcode = self.read_mem(self.pc);
-            let instr = get_instr(opcode).expect(format!("Illegal instruction hit: {:x}", opcode).as_str());
+            let instr = get_instr(opcode).expect(format!("Illegal instruction hit: 0x{:0>2x}", opcode).as_str());
 
             let operands: String;
             match instr.len - 1 {
                 0 => operands = String::new(),
                 1 => operands = format!("0x{:0>2x}", self.read_mem(self.pc + 1)),
-                2 => operands = format!("0x{:0>2x} 0x{:0>2x}", self.read_mem(self.pc + 1), self.read_mem(self.pc + 2)),
+                2 => operands = format!("0x{:0>2x}{:0>2x}", self.read_mem(self.pc + 2), self.read_mem(self.pc + 1)),
                 _ => unreachable!()
             };
             println!("0x{:0>4x}: {} {}", self.pc, instr.name, operands);
