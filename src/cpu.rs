@@ -141,7 +141,12 @@ impl CPU {
                 let ret = abs.wrapping_add(self.x as u16);
                 (ret, (abs >> 8) != (ret >> 8))
             },
-            AddressingModes::Indirect => (self.read_mem_u16(self.read_mem_u16(self.pc + 1)), false),
+            AddressingModes::Indirect => {
+                let addr = self.read_mem_u16(self.pc + 1);
+                let lo = self.read_mem(addr);
+                let hi = self.read_mem((addr & 0xff00) + ((addr + 1) & 0xff)); // in indirect mode the top half of the address cannot change
+                (u16::from_le_bytes([lo, hi]), false)
+            },
             AddressingModes::IndexedIndirect => (self.read_mem_u16(self.read_mem(self.pc + 1).wrapping_add(self.x) as u16), false),
             AddressingModes::IndirectIndexed => {
                 let ind = self.read_mem_u16(self.read_mem(self.pc + 1) as u16);

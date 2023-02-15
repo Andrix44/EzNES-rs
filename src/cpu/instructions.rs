@@ -365,7 +365,7 @@ impl CPU {
 
     fn dec(&mut self, mode: &AddressingModes) {
         let (addr, _) = self.get_operand_addr(mode);
-        self.write_mem(addr, self.read_mem(addr) - 1);
+        self.write_mem(addr, self.read_mem(addr).wrapping_sub(1));
 
         self.flags.zero = self.read_mem(addr) == 0;
         self.flags.negative = self.read_mem(addr) >> 7 == 1;
@@ -399,7 +399,7 @@ impl CPU {
 
     fn inc(&mut self, mode: &AddressingModes) {
         let (addr, _) = self.get_operand_addr(mode);
-        self.write_mem(addr, self.read_mem(addr) + 1);
+        self.write_mem(addr, self.read_mem(addr).wrapping_add(1));
 
         self.flags.zero = self.read_mem(addr) == 0;
         self.flags.negative = self.read_mem(addr) >> 7 == 1;
