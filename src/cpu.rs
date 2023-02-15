@@ -33,8 +33,8 @@ struct Flags {
 
 impl Flags {
     pub fn get_u8(&self) -> u8 {
-        (self.carry as u8) + (self.zero as u8) << 1 + (self.interrupt_disable as u8) << 2 + (self.decimal_mode as u8) << 3 +
-        (self.breakfl as u8) << 4 + (self.unused as u8) << 5 + (self.overflow as u8) << 6 + (self.negative as u8) << 7
+        (self.carry as u8) + ((self.zero as u8) << 1) + ((self.interrupt_disable as u8) << 2) + ((self.decimal_mode as u8) << 3) +
+        ((self.breakfl as u8) << 4) + ((self.unused as u8) << 5) + ((self.overflow as u8) << 6) + ((self.negative as u8) << 7)
     }
 
     pub fn set_u8(&mut self, data: u8) {
@@ -94,7 +94,7 @@ impl CPU {
             },
             mem,
             pc_autoincrement: false,
-            cycles: 0,
+            cycles: 7,
         }
     }
 
@@ -203,7 +203,8 @@ impl CPU {
                 2 => operands = format!("0x{:0>2x}{:0>2x}", self.read_mem(self.pc + 2), self.read_mem(self.pc + 1)),
                 _ => unreachable!()
             };
-            println!("0x{:0>4x}: {} {}", self.pc, instr.name, operands);
+            println!("0x{:0>4x}: {} {: <6} A:{:0>2x} X:{:0>2x} Y:{:0>2x} F:{:0>2x} SP:{:0>2x} CYC:{}",
+                self.pc, instr.name, operands, self.a, self.x, self.y, self.flags.get_u8(), self.sp, self.cycles);
             
             (instr.handler)(self, &instr.mode);
 

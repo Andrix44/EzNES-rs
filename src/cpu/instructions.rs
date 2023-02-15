@@ -279,8 +279,8 @@ impl CPU {
     fn bit(&mut self, mode: &AddressingModes) {
         let (data, _) = self.get_data(mode);
         self.flags.zero = self.a & data == 0;
-        self.flags.overflow = data >> 7 == 1;
-        self.flags.negative = (data >> 6) & 1 == 1;
+        self.flags.negative = data >> 7 == 1;
+        self.flags.overflow = (data >> 6) & 1 == 1;
     }
 
     fn bmi(&mut self, _mode: &AddressingModes) {
