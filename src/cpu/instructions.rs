@@ -9,7 +9,7 @@ pub struct InstrEntry {
     pub cycles: u8,
 }
 
-const INSTR_LIST: [InstrEntry; 151] = [
+const INSTR_LIST: [InstrEntry; 185] = [
     InstrEntry {name: "ADC", handler: CPU::adc, opcode: 0x69, mode: AddressingModes::Immediate, len: 2, cycles: 2},
     InstrEntry {name: "ADC", handler: CPU::adc, opcode: 0x65, mode: AddressingModes::ZeroPage, len: 2, cycles: 3},
     InstrEntry {name: "ADC", handler: CPU::adc, opcode: 0x75, mode: AddressingModes::ZeroPageX, len: 2, cycles: 4},
@@ -199,6 +199,56 @@ const INSTR_LIST: [InstrEntry; 151] = [
     
     InstrEntry {name: "TXA", handler: CPU::txa, opcode: 0x8a, mode: AddressingModes::Implicit, len: 1, cycles: 2},
     InstrEntry {name: "TYA", handler: CPU::tya, opcode: 0x98, mode: AddressingModes::Implicit, len: 1, cycles: 2},
+
+    // ---------------
+    // Illegal opcodes
+    // ---------------
+
+    InstrEntry { name: "ALR", handler: CPU::alr, opcode: 0x4b, mode: AddressingModes::Immediate, len: 2, cycles: 2},
+
+    InstrEntry { name: "ANC", handler: CPU::anc, opcode: 0x0b, mode: AddressingModes::Immediate, len: 2, cycles: 2},
+    InstrEntry { name: "ANC", handler: CPU::anc, opcode: 0x2b, mode: AddressingModes::Immediate, len: 2, cycles: 2},
+
+    InstrEntry { name: "ANE", handler: CPU::ane, opcode: 0x8b, mode: AddressingModes::Immediate, len: 2, cycles: 2},
+
+    InstrEntry { name: "ARR", handler: CPU::arr, opcode: 0x6b, mode: AddressingModes::Immediate, len: 2, cycles: 2},
+
+    InstrEntry { name: "DCP", handler: CPU::dcp, opcode: 0xc7, mode: AddressingModes::ZeroPage, len: 2, cycles: 5},
+    InstrEntry { name: "DCP", handler: CPU::dcp, opcode: 0xd7, mode: AddressingModes::ZeroPageX, len: 2, cycles: 6},
+    InstrEntry { name: "DCP", handler: CPU::dcp, opcode: 0xcf, mode: AddressingModes::Absolute, len: 3, cycles: 6},
+    InstrEntry { name: "DCP", handler: CPU::dcp, opcode: 0xdf, mode: AddressingModes::AbsoluteX, len: 3, cycles: 7},
+    InstrEntry { name: "DCP", handler: CPU::dcp, opcode: 0xdb, mode: AddressingModes::AbsoluteY, len: 3, cycles: 7},
+    InstrEntry { name: "DCP", handler: CPU::dcp, opcode: 0xc3, mode: AddressingModes::IndexedIndirect, len: 2, cycles: 8},
+    InstrEntry { name: "DCP", handler: CPU::dcp, opcode: 0xd3, mode: AddressingModes::IndirectIndexed, len: 2, cycles: 8},
+    
+    InstrEntry { name: "ISC", handler: CPU::isc, opcode: 0xe7, mode: AddressingModes::ZeroPage, len: 2, cycles: 5},
+    InstrEntry { name: "ISC", handler: CPU::isc, opcode: 0xf7, mode: AddressingModes::ZeroPageX, len: 2, cycles: 6},
+    InstrEntry { name: "ISC", handler: CPU::isc, opcode: 0xef, mode: AddressingModes::Absolute, len: 3, cycles: 6},
+    InstrEntry { name: "ISC", handler: CPU::isc, opcode: 0xff, mode: AddressingModes::AbsoluteX, len: 3, cycles: 7},
+    InstrEntry { name: "ISC", handler: CPU::isc, opcode: 0xfb, mode: AddressingModes::AbsoluteY, len: 3, cycles: 7},
+    InstrEntry { name: "ISC", handler: CPU::isc, opcode: 0xe3, mode: AddressingModes::IndexedIndirect, len: 2, cycles: 8},
+    InstrEntry { name: "ISC", handler: CPU::isc, opcode: 0xf3, mode: AddressingModes::IndirectIndexed, len: 2, cycles: 8},
+
+    InstrEntry { name: "LAS", handler: CPU::las, opcode: 0xbb, mode: AddressingModes::AbsoluteY, len: 3, cycles: 4},
+
+    InstrEntry { name: "LAX", handler: CPU::lax, opcode: 0xa7, mode: AddressingModes::ZeroPage, len: 2, cycles: 3},
+    InstrEntry { name: "LAX", handler: CPU::lax, opcode: 0xb7, mode: AddressingModes::ZeroPageY, len: 2, cycles: 4},
+    InstrEntry { name: "LAX", handler: CPU::lax, opcode: 0xaf, mode: AddressingModes::Absolute, len: 3, cycles: 4},
+    InstrEntry { name: "LAX", handler: CPU::lax, opcode: 0xbf, mode: AddressingModes::AbsoluteY, len: 3, cycles: 4},
+    InstrEntry { name: "LAX", handler: CPU::lax, opcode: 0xa3, mode: AddressingModes::IndexedIndirect, len: 2, cycles: 6},
+    InstrEntry { name: "LAX", handler: CPU::lax, opcode: 0xb3, mode: AddressingModes::IndirectIndexed, len: 2, cycles: 5},
+
+    InstrEntry { name: "LXA", handler: CPU::lxa, opcode: 0xab, mode: AddressingModes::Immediate, len: 2, cycles: 2},
+
+    InstrEntry { name: "LRA", handler: CPU::rla, opcode: 0x27, mode: AddressingModes::ZeroPage, len: 2, cycles: 5},
+    InstrEntry { name: "LRA", handler: CPU::rla, opcode: 0x37, mode: AddressingModes::ZeroPageX, len: 2, cycles: 6},
+    InstrEntry { name: "LRA", handler: CPU::rla, opcode: 0x2f, mode: AddressingModes::Absolute, len: 3, cycles: 6},
+    InstrEntry { name: "LRA", handler: CPU::rla, opcode: 0x3f, mode: AddressingModes::AbsoluteX, len: 3, cycles: 7},
+    InstrEntry { name: "LRA", handler: CPU::rla, opcode: 0x3b, mode: AddressingModes::AbsoluteY, len: 3, cycles: 7},
+    InstrEntry { name: "LRA", handler: CPU::rla, opcode: 0x23, mode: AddressingModes::IndexedIndirect, len: 2, cycles: 8},
+    InstrEntry { name: "LRA", handler: CPU::rla, opcode: 0x33, mode: AddressingModes::IndirectIndexed, len: 2, cycles: 8},
+
+    //InstrEntry { name: "", handler: CPU::, opcode: 0x, mode: AddressingModes::, len: , cycles: },
 ];
 
 pub fn get_instr(opcode: u8) -> Option<&'static InstrEntry> {
@@ -244,7 +294,7 @@ impl CPU {
             self.flags.negative = self.a >> 7 == 1;
         }
         else {
-            let (addr, _) = self.get_operand_addr(mode);
+            let addr = self.get_operand_addr(mode).0;
             self.flags.carry = self.read_mem(addr) >> 7 == 1;
             self.write_mem(addr, self.read_mem(addr) << 1);
             self.flags.zero = self.read_mem(addr) == 0;
@@ -277,7 +327,7 @@ impl CPU {
     }
 
     fn bit(&mut self, mode: &AddressingModes) {
-        let (data, _) = self.get_data(mode);
+        let data = self.get_data(mode).0;
         self.flags.zero = self.a & data == 0;
         self.flags.negative = data >> 7 == 1;
         self.flags.overflow = (data >> 6) & 1 == 1;
@@ -348,7 +398,7 @@ impl CPU {
     }
 
     fn cpx(&mut self, mode: &AddressingModes) {
-        let (data, _) = self.get_data(mode);
+        let data = self.get_data(mode).0;
 
         self.flags.carry = self.x >= data;
         self.flags.zero = self.x == data;
@@ -356,7 +406,7 @@ impl CPU {
     }
     
     fn cpy(&mut self, mode: &AddressingModes) {
-        let (data, _) = self.get_data(mode);
+        let data = self.get_data(mode).0;
 
         self.flags.carry = self.y >= data;
         self.flags.zero = self.y == data;
@@ -364,7 +414,7 @@ impl CPU {
     }
 
     fn dec(&mut self, mode: &AddressingModes) {
-        let (addr, _) = self.get_operand_addr(mode);
+        let addr = self.get_operand_addr(mode).0;
         self.write_mem(addr, self.read_mem(addr).wrapping_sub(1));
 
         self.flags.zero = self.read_mem(addr) == 0;
@@ -398,7 +448,7 @@ impl CPU {
     }
 
     fn inc(&mut self, mode: &AddressingModes) {
-        let (addr, _) = self.get_operand_addr(mode);
+        let addr = self.get_operand_addr(mode).0;
         self.write_mem(addr, self.read_mem(addr).wrapping_add(1));
 
         self.flags.zero = self.read_mem(addr) == 0;
@@ -420,7 +470,7 @@ impl CPU {
     }
 
     fn jmp(&mut self, mode: &AddressingModes) {
-        (self.pc, _) = self.get_operand_addr(mode); 
+        self.pc = self.get_operand_addr(mode).0; 
 
         self.pc_autoincrement = false;
     }
@@ -477,7 +527,7 @@ impl CPU {
             self.flags.negative = false;
         }
         else {
-            let (addr, _) = self.get_operand_addr(mode);
+            let addr = self.get_operand_addr(mode).0;
             self.flags.carry = self.read_mem(addr) & 1 == 1;
             self.write_mem(addr, self.read_mem(addr) >> 1);
             self.flags.zero = self.read_mem(addr) == 0;
@@ -541,15 +591,17 @@ impl CPU {
             self.flags.negative = self.a >> 7 == 1;
         }
         else {
-            let (addr, _) = self.get_operand_addr(mode);
+            let addr = self.get_operand_addr(mode).0;
             let bit0 = self.flags.carry;
-            self.flags.carry = self.read_mem(addr) >> 7 == 1;
-            self.write_mem(addr, self.read_mem(addr) << 1);
+            let data = self.read_mem(addr);
+            self.flags.carry = data >> 7 == 1;
+            let mut res = data << 1;
             if bit0 {
-                self.write_mem(addr, self.read_mem(addr) | 0b00000001);
+                res |= 0b00000001;
             }
-            self.flags.zero = self.read_mem(addr) == 0;
-            self.flags.negative = self.read_mem(addr) >> 7 == 1;
+            self.write_mem(addr, res);
+            self.flags.zero = data == 0;
+            self.flags.negative = data >> 7 == 1;
         }
     }
 
@@ -565,15 +617,17 @@ impl CPU {
             self.flags.negative = self.a >> 7 == 1;
         }
         else {
-            let (addr, _) = self.get_operand_addr(mode);
+            let addr = self.get_operand_addr(mode).0;
             let bit7 = self.flags.carry;
-            self.flags.carry = self.read_mem(addr) & 1 == 1;
-            self.write_mem(addr, self.read_mem(addr) >> 1);
+            let data = self.read_mem(addr);
+            self.flags.carry = data & 1 == 1;
+            let mut res = data >> 1;
             if bit7 {
-                self.write_mem(addr, self.read_mem(addr) | 0b10000000);
+                res  |= 0b10000000;
             }
-            self.flags.zero = self.read_mem(addr) == 0;
-            self.flags.negative = self.read_mem(addr) >> 7 == 1;
+            self.write_mem(addr, res);
+            self.flags.zero = data == 0;
+            self.flags.negative = data >> 7 == 1;
         }
     }
 
@@ -621,17 +675,17 @@ impl CPU {
     }
 
     fn sta(&mut self, mode: &AddressingModes) {
-        let (addr, _) = self.get_operand_addr(mode);
+        let addr = self.get_operand_addr(mode).0;
         self.write_mem(addr, self.a);
     }
 
     fn stx(&mut self, mode: &AddressingModes) {
-        let (addr, _) = self.get_operand_addr(mode);
+        let addr = self.get_operand_addr(mode).0;
         self.write_mem(addr, self.x);
     }
 
     fn sty(&mut self, mode: &AddressingModes) {
-        let (addr, _) = self.get_operand_addr(mode);
+        let addr = self.get_operand_addr(mode).0;
         self.write_mem(addr, self.y);
     }
 
@@ -674,4 +728,130 @@ impl CPU {
         self.flags.negative = self.a >> 7 == 1;
     }
 
+    // ---------------
+    // Illegal opcodes
+    // ---------------
+
+    fn alr(&mut self, mode: &AddressingModes) {
+        self.a = self.a & self.get_data(mode).0;
+        self.flags.carry = self.a & 1 == 1;
+        self.a >>= 1;
+
+        self.flags.zero = self.a == 0;
+        self.flags.negative = false;
+    }
+
+    fn anc(&mut self, mode: &AddressingModes) {
+        self.a = self.a & self.get_data(mode).0;
+
+        self.flags.zero = self.a == 0;
+        self.flags.negative = self.a >> 7 == 1;
+        self.flags.carry = self.flags.negative;
+    }
+
+    fn ane(&mut self, mode: &AddressingModes) {
+        self.a = (self.a | 0) & self.x & self.get_data(mode).0;
+
+        self.flags.zero = self.a == 0;
+        self.flags.negative = self.a >> 7 == 1;
+    }
+
+    fn arr(&mut self, mode: &AddressingModes) {
+        self.a = self.a & self.get_data(mode).0;
+        self.a = self.a.rotate_right(1); // different sites say different things, maybe here I have to use carry?
+
+        self.flags.zero = self.a == 0;
+        self.flags.negative = self.a >> 7 == 1;
+
+        (self.flags.carry, self.flags.overflow) = match (self.a >> 5) & 3 {
+            0 => (false, false),
+            1 => (false, true),
+            2 => (true, true),
+            3 => (true, false),
+            _ => unreachable!()
+        }
+    }
+
+    fn dcp(&mut self, mode: &AddressingModes) {
+        let addr = self.get_operand_addr(mode).0;
+        let data = self.read_mem(addr).wrapping_sub(1);
+        self.write_mem(addr, data);
+
+        self.flags.carry = self.a >= data;
+        self.flags.zero = self.a == data;
+        self.flags.negative = self.a.overflowing_sub(data).1;
+    }
+
+    fn isc(&mut self, mode: &AddressingModes) {
+        let addr = self.get_operand_addr(mode).0;
+        let data = self.read_mem(addr).wrapping_add(1);
+        self.write_mem(addr, data);
+
+        let orig_sign = self.a >> 7;
+        let carry1: bool;
+        let carry2: bool;
+        (self.a, carry1) = self.a.overflowing_sub(data);
+        (self.a, carry2) = self.a.overflowing_sub(self.flags.carry as u8);
+        self.flags.carry = carry1 || carry2;
+        self.flags.zero = self.a == 0;
+        self.flags.overflow = (orig_sign == data >> 7) && (orig_sign != self.a >> 7);
+        self.flags.negative = self.a >> 7 == 1;
+    }
+
+    fn las(&mut self, mode: &AddressingModes) {
+        let (data, page_crossed) = self.get_data(mode);
+
+        self.a = data & self.sp;
+        self.x = self.a;
+        self.sp = self.a;
+
+        self.flags.zero = self.a == 0;
+        self.flags.negative = self.a >> 7 == 1;
+
+        if page_crossed {
+            self.cycles += 1;
+        }
+    }
+
+    fn lax(&mut self, mode: &AddressingModes) {
+        let (data, page_crossed) = self.get_data(mode);
+
+        self.a = data;
+        self.x = self.a;
+
+        self.flags.zero = self.a == 0;
+        self.flags.negative = self.a >> 7 == 1;
+
+        if page_crossed {
+            self.cycles += 1;
+        }
+    }
+
+    fn lxa(&mut self, mode: &AddressingModes) {
+        self.a = (self.a | 0) & self.get_data(mode).0;
+        self.x = self.a;
+
+        self.flags.zero = self.a == 0;
+        self.flags.negative = self.a >> 7 == 1;
+    }
+
+    fn rla(&mut self, mode: &AddressingModes) {
+        let addr = self.get_operand_addr(mode).0;
+        let bit0 = self.flags.carry;
+        let data = self.read_mem(addr);
+        self.flags.carry = data >> 7 == 1;
+        let mut res = data << 1;
+        if bit0 {
+            res |= 0b00000001;
+        }
+        self.write_mem(addr, res);
+        self.a &= data;
+        
+        self.flags.zero = self.a == 0;
+        self.flags.negative = self.a >> 7 == 1;
+    }
+
+    fn rra(&mut self, mode: &AddressingModes) {
+        todo!();
+    }
 }
