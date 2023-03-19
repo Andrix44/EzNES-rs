@@ -104,7 +104,11 @@ impl CPU {
 
     fn read_mem_u16(&self, addr: u16) -> u16 {
         let lo = self.read_mem(addr);
-        let hi = self.read_mem(addr + 1);
+        let hi = match addr {
+            0xff => {
+                self.read_mem(0)},
+            _ => self.read_mem(addr + 1)
+        };
         u16::from_le_bytes([lo, hi])
     }
 
@@ -128,17 +132,17 @@ impl CPU {
             AddressingModes::ZeroPageY => (self.read_mem(self.pc + 1).wrapping_add(self.y) as u16, false),
             AddressingModes::Relative => {
                 let ret = (self.pc + 2).wrapping_add_signed(self.read_mem(self.pc + 1) as i8 as i16);
-                (ret, (self.pc >> 8) != (ret >> 8))
+                (ret, ((self.pc + 2) >> 8) != (ret >> 8))
             },
             AddressingModes::Absolute => (self.read_mem_u16(self.pc + 1), false),
             AddressingModes::AbsoluteX => {
                 let abs = self.read_mem_u16(self.pc + 1);
-                let ret = abs.wrapping_add(self.y as u16);
+                let ret = abs.wrapping_add(self.x as u16);
                 (ret, (abs >> 8) != (ret >> 8))
             },
             AddressingModes::AbsoluteY => {
                 let abs = self.read_mem_u16(self.pc + 1);
-                let ret = abs.wrapping_add(self.x as u16);
+                let ret = abs.wrapping_add(self.y as u16);
                 (ret, (abs >> 8) != (ret >> 8))
             },
             AddressingModes::Indirect => {
@@ -165,7 +169,7 @@ impl CPU {
     fn do_relative_jump(&mut self) {
         let page_crossed: bool;
         (self.pc, page_crossed) = self.get_operand_addr(&AddressingModes::Relative);
-        self.pc_autoincrement = false;      
+        self.pc_autoincrement = false;
         self.cycles += 1;
         if page_crossed {
             self.cycles += 1;
@@ -210,7 +214,7 @@ impl CPU {
             };
             println!("0x{:0>4x}: {} {: <6} A:{:0>2x} X:{:0>2x} Y:{:0>2x} F:{:0>2x} SP:{:0>2x} CYC:{}",
                 self.pc, instr.name, operands, self.a, self.x, self.y, self.flags.get_u8(), self.sp, self.cycles);
-            
+
             (instr.handler)(self, &instr.mode);
 
             self.cycles += instr.cycles as u64;

@@ -9,7 +9,7 @@ pub struct InstrEntry {
     pub cycles: u8,
 }
 
-const INSTR_LIST: [InstrEntry; 185] = [
+const INSTR_LIST: [InstrEntry; 256] = [
     InstrEntry {name: "ADC", handler: CPU::adc, opcode: 0x69, mode: AddressingModes::Immediate, len: 2, cycles: 2},
     InstrEntry {name: "ADC", handler: CPU::adc, opcode: 0x65, mode: AddressingModes::ZeroPage, len: 2, cycles: 3},
     InstrEntry {name: "ADC", handler: CPU::adc, opcode: 0x75, mode: AddressingModes::ZeroPageX, len: 2, cycles: 4},
@@ -177,7 +177,7 @@ const INSTR_LIST: [InstrEntry; 185] = [
 
     InstrEntry {name: "STA", handler: CPU::sta, opcode: 0x85, mode: AddressingModes::ZeroPage, len: 2, cycles: 3},
     InstrEntry {name: "STA", handler: CPU::sta, opcode: 0x95, mode: AddressingModes::ZeroPageX, len: 2, cycles: 4},
-    InstrEntry {name: "STA", handler: CPU::sta, opcode: 0x8d, mode: AddressingModes::Absolute, len: 3, cycles: 5},
+    InstrEntry {name: "STA", handler: CPU::sta, opcode: 0x8d, mode: AddressingModes::Absolute, len: 3, cycles: 4},
     InstrEntry {name: "STA", handler: CPU::sta, opcode: 0x9d, mode: AddressingModes::AbsoluteX, len: 3, cycles: 5},
     InstrEntry {name: "STA", handler: CPU::sta, opcode: 0x99, mode: AddressingModes::AbsoluteY, len: 3, cycles: 5},
     InstrEntry {name: "STA", handler: CPU::sta, opcode: 0x81, mode: AddressingModes::IndexedIndirect, len: 2, cycles: 6},
@@ -188,7 +188,7 @@ const INSTR_LIST: [InstrEntry; 185] = [
     InstrEntry {name: "STX", handler: CPU::stx, opcode: 0x8e, mode: AddressingModes::Absolute, len: 3, cycles: 4},
 
     InstrEntry {name: "STY", handler: CPU::sty, opcode: 0x84, mode: AddressingModes::ZeroPage, len: 2, cycles: 3},
-    InstrEntry {name: "STY", handler: CPU::sty, opcode: 0x94, mode: AddressingModes::ZeroPageY, len: 2, cycles: 4},
+    InstrEntry {name: "STY", handler: CPU::sty, opcode: 0x94, mode: AddressingModes::ZeroPageX, len: 2, cycles: 4},
     InstrEntry {name: "STY", handler: CPU::sty, opcode: 0x8c, mode: AddressingModes::Absolute, len: 3, cycles: 4},
     
     InstrEntry {name: "TAX", handler: CPU::tax, opcode: 0xaa, mode: AddressingModes::Implicit, len: 1, cycles: 2},
@@ -248,7 +248,87 @@ const INSTR_LIST: [InstrEntry; 185] = [
     InstrEntry { name: "LRA", handler: CPU::rla, opcode: 0x23, mode: AddressingModes::IndexedIndirect, len: 2, cycles: 8},
     InstrEntry { name: "LRA", handler: CPU::rla, opcode: 0x33, mode: AddressingModes::IndirectIndexed, len: 2, cycles: 8},
 
-    //InstrEntry { name: "", handler: CPU::, opcode: 0x, mode: AddressingModes::, len: , cycles: },
+    InstrEntry { name: "RRA", handler: CPU::rra, opcode: 0x67, mode: AddressingModes::ZeroPage, len: 2, cycles: 5},
+    InstrEntry { name: "RRA", handler: CPU::rra, opcode: 0x77, mode: AddressingModes::ZeroPageX, len: 2, cycles: 6},
+    InstrEntry { name: "RRA", handler: CPU::rra, opcode: 0x6f, mode: AddressingModes::Absolute, len: 3, cycles: 6},
+    InstrEntry { name: "RRA", handler: CPU::rra, opcode: 0x7f, mode: AddressingModes::AbsoluteX, len: 3, cycles: 7},
+    InstrEntry { name: "RRA", handler: CPU::rra, opcode: 0x7b, mode: AddressingModes::AbsoluteY, len: 3, cycles: 7},
+    InstrEntry { name: "RRA", handler: CPU::rra, opcode: 0x63, mode: AddressingModes::IndexedIndirect, len: 2, cycles: 8},
+    InstrEntry { name: "RRA", handler: CPU::rra, opcode: 0x73, mode: AddressingModes::IndirectIndexed, len: 2, cycles: 8},
+
+    InstrEntry { name: "SAX", handler: CPU::sax, opcode: 0x87, mode: AddressingModes::ZeroPage, len: 2, cycles: 3},
+    InstrEntry { name: "SAX", handler: CPU::sax, opcode: 0x97, mode: AddressingModes::ZeroPageY, len: 2, cycles: 4},
+    InstrEntry { name: "SAX", handler: CPU::sax, opcode: 0x8f, mode: AddressingModes::Absolute, len: 3, cycles: 4},
+    InstrEntry { name: "SAX", handler: CPU::sax, opcode: 0x83, mode: AddressingModes::IndexedIndirect, len: 2, cycles: 6},
+
+    InstrEntry { name: "SBX", handler: CPU::sbx, opcode: 0xcb, mode: AddressingModes::Immediate, len: 2, cycles: 2},
+
+    InstrEntry { name: "SHA", handler: CPU::sha, opcode: 0x9f, mode: AddressingModes::AbsoluteY, len: 3, cycles: 5},
+    InstrEntry { name: "SHA", handler: CPU::sha, opcode: 0x93, mode: AddressingModes::IndirectIndexed, len: 2, cycles: 6},
+
+    InstrEntry { name: "SHX", handler: CPU::shx, opcode: 0x9e, mode: AddressingModes::AbsoluteY, len: 3, cycles: 5},
+    InstrEntry { name: "SHY", handler: CPU::shy, opcode: 0x9c, mode: AddressingModes::AbsoluteX, len: 3, cycles: 5},
+
+    InstrEntry { name: "SLO", handler: CPU::slo, opcode: 0x07, mode: AddressingModes::ZeroPage, len: 2, cycles: 5},
+    InstrEntry { name: "SLO", handler: CPU::slo, opcode: 0x17, mode: AddressingModes::ZeroPageX, len: 2, cycles: 6},
+    InstrEntry { name: "SLO", handler: CPU::slo, opcode: 0x0f, mode: AddressingModes::Absolute, len: 3, cycles: 6},
+    InstrEntry { name: "SLO", handler: CPU::slo, opcode: 0x1f, mode: AddressingModes::AbsoluteX, len: 3, cycles: 7},
+    InstrEntry { name: "SLO", handler: CPU::slo, opcode: 0x1b, mode: AddressingModes::AbsoluteY, len: 3, cycles: 7},
+    InstrEntry { name: "SLO", handler: CPU::slo, opcode: 0x03, mode: AddressingModes::IndexedIndirect, len: 2, cycles: 8},
+    InstrEntry { name: "SLO", handler: CPU::slo, opcode: 0x13, mode: AddressingModes::IndirectIndexed, len: 2, cycles: 8},
+
+    InstrEntry { name: "SRE", handler: CPU::sre, opcode: 0x47, mode: AddressingModes::ZeroPage, len: 2, cycles: 5},
+    InstrEntry { name: "SRE", handler: CPU::sre, opcode: 0x57, mode: AddressingModes::ZeroPageX, len: 2, cycles: 6},
+    InstrEntry { name: "SRE", handler: CPU::sre, opcode: 0x4f, mode: AddressingModes::Absolute, len: 3, cycles: 6},
+    InstrEntry { name: "SRE", handler: CPU::sre, opcode: 0x5f, mode: AddressingModes::AbsoluteX, len: 3, cycles: 7},
+    InstrEntry { name: "SRE", handler: CPU::sre, opcode: 0x5b, mode: AddressingModes::AbsoluteY, len: 3, cycles: 7},
+    InstrEntry { name: "SRE", handler: CPU::sre, opcode: 0x43, mode: AddressingModes::IndexedIndirect, len: 2, cycles: 8},
+    InstrEntry { name: "SRE", handler: CPU::sre, opcode: 0x53, mode: AddressingModes::IndirectIndexed, len: 2, cycles: 8},
+
+    InstrEntry { name: "TAS", handler: CPU::tas, opcode: 0x9b, mode: AddressingModes::AbsoluteY, len: 3, cycles: 5},
+
+    InstrEntry { name: "SBC", handler: CPU::sbc, opcode: 0xeb, mode: AddressingModes::Immediate, len: 2, cycles: 2},
+
+    InstrEntry { name: "NOP", handler: CPU::nop, opcode: 0x1a, mode: AddressingModes::Implicit, len: 1, cycles: 2},
+    InstrEntry { name: "NOP", handler: CPU::nop, opcode: 0x3a, mode: AddressingModes::Implicit, len: 1, cycles: 2},
+    InstrEntry { name: "NOP", handler: CPU::nop, opcode: 0x5a, mode: AddressingModes::Implicit, len: 1, cycles: 2},
+    InstrEntry { name: "NOP", handler: CPU::nop, opcode: 0x7a, mode: AddressingModes::Implicit, len: 1, cycles: 2},
+    InstrEntry { name: "NOP", handler: CPU::nop, opcode: 0xda, mode: AddressingModes::Implicit, len: 1, cycles: 2},
+    InstrEntry { name: "NOP", handler: CPU::nop, opcode: 0xfa, mode: AddressingModes::Implicit, len: 1, cycles: 2},
+    InstrEntry { name: "NOP", handler: CPU::nop, opcode: 0x80, mode: AddressingModes::Immediate, len: 2, cycles: 2},
+    InstrEntry { name: "NOP", handler: CPU::nop, opcode: 0x82, mode: AddressingModes::Immediate, len: 2, cycles: 2},
+    InstrEntry { name: "NOP", handler: CPU::nop, opcode: 0x89, mode: AddressingModes::Immediate, len: 2, cycles: 2},
+    InstrEntry { name: "NOP", handler: CPU::nop, opcode: 0xc2, mode: AddressingModes::Immediate, len: 2, cycles: 2},
+    InstrEntry { name: "NOP", handler: CPU::nop, opcode: 0xe2, mode: AddressingModes::Immediate, len: 2, cycles: 2},
+    InstrEntry { name: "NOP", handler: CPU::nop, opcode: 0x04, mode: AddressingModes::ZeroPage, len: 2, cycles: 3},
+    InstrEntry { name: "NOP", handler: CPU::nop, opcode: 0x44, mode: AddressingModes::ZeroPage, len: 2, cycles: 3},
+    InstrEntry { name: "NOP", handler: CPU::nop, opcode: 0x64, mode: AddressingModes::ZeroPage, len: 2, cycles: 3},
+    InstrEntry { name: "NOP", handler: CPU::nop, opcode: 0x14, mode: AddressingModes::ZeroPageX, len: 2, cycles: 4},
+    InstrEntry { name: "NOP", handler: CPU::nop, opcode: 0x34, mode: AddressingModes::ZeroPageX, len: 2, cycles: 4},
+    InstrEntry { name: "NOP", handler: CPU::nop, opcode: 0x54, mode: AddressingModes::ZeroPageX, len: 2, cycles: 4},
+    InstrEntry { name: "NOP", handler: CPU::nop, opcode: 0x74, mode: AddressingModes::ZeroPageX, len: 2, cycles: 4},
+    InstrEntry { name: "NOP", handler: CPU::nop, opcode: 0xd4, mode: AddressingModes::ZeroPageX, len: 2, cycles: 4},
+    InstrEntry { name: "NOP", handler: CPU::nop, opcode: 0xf4, mode: AddressingModes::ZeroPageX, len: 2, cycles: 4},
+    InstrEntry { name: "NOP", handler: CPU::nop, opcode: 0x0c, mode: AddressingModes::Absolute, len: 3, cycles: 4},
+    InstrEntry { name: "NOP", handler: CPU::nop, opcode: 0x1c, mode: AddressingModes::AbsoluteX, len: 3, cycles: 4},
+    InstrEntry { name: "NOP", handler: CPU::nop, opcode: 0x3c, mode: AddressingModes::AbsoluteX, len: 3, cycles: 4},
+    InstrEntry { name: "NOP", handler: CPU::nop, opcode: 0x5c, mode: AddressingModes::AbsoluteX, len: 3, cycles: 4},
+    InstrEntry { name: "NOP", handler: CPU::nop, opcode: 0x7c, mode: AddressingModes::AbsoluteX, len: 3, cycles: 4},
+    InstrEntry { name: "NOP", handler: CPU::nop, opcode: 0xdc, mode: AddressingModes::AbsoluteX, len: 3, cycles: 4},
+    InstrEntry { name: "NOP", handler: CPU::nop, opcode: 0xfc, mode: AddressingModes::AbsoluteX, len: 3, cycles: 4},
+
+    InstrEntry { name: "JAM", handler: CPU::jam, opcode: 0x02, mode: AddressingModes::Implicit, len: 1, cycles: 1},
+    InstrEntry { name: "JAM", handler: CPU::jam, opcode: 0x12, mode: AddressingModes::Implicit, len: 1, cycles: 1},
+    InstrEntry { name: "JAM", handler: CPU::jam, opcode: 0x22, mode: AddressingModes::Implicit, len: 1, cycles: 1},
+    InstrEntry { name: "JAM", handler: CPU::jam, opcode: 0x32, mode: AddressingModes::Implicit, len: 1, cycles: 1},
+    InstrEntry { name: "JAM", handler: CPU::jam, opcode: 0x42, mode: AddressingModes::Implicit, len: 1, cycles: 1},
+    InstrEntry { name: "JAM", handler: CPU::jam, opcode: 0x52, mode: AddressingModes::Implicit, len: 1, cycles: 1},
+    InstrEntry { name: "JAM", handler: CPU::jam, opcode: 0x62, mode: AddressingModes::Implicit, len: 1, cycles: 1},
+    InstrEntry { name: "JAM", handler: CPU::jam, opcode: 0x72, mode: AddressingModes::Implicit, len: 1, cycles: 1},
+    InstrEntry { name: "JAM", handler: CPU::jam, opcode: 0x92, mode: AddressingModes::Implicit, len: 1, cycles: 1},
+    InstrEntry { name: "JAM", handler: CPU::jam, opcode: 0xb2, mode: AddressingModes::Implicit, len: 1, cycles: 1},
+    InstrEntry { name: "JAM", handler: CPU::jam, opcode: 0xd2, mode: AddressingModes::Implicit, len: 1, cycles: 1},
+    InstrEntry { name: "JAM", handler: CPU::jam, opcode: 0xf2, mode: AddressingModes::Implicit, len: 1, cycles: 1},
 ];
 
 pub fn get_instr(opcode: u8) -> Option<&'static InstrEntry> {
@@ -256,9 +336,7 @@ pub fn get_instr(opcode: u8) -> Option<&'static InstrEntry> {
 }
 
 impl CPU {
-    fn adc(&mut self, mode: &AddressingModes) {
-        let (data, page_crossed) = self.get_data(mode);
-
+    fn __add(&mut self, data: u8) {
         let orig_sign = self.a >> 7;
         let carry1: bool;
         let carry2: bool;
@@ -268,6 +346,12 @@ impl CPU {
         self.flags.zero = self.a == 0;
         self.flags.overflow = (orig_sign == data >> 7) && (orig_sign != self.a >> 7);
         self.flags.negative = self.a >> 7 == 1;
+    }
+
+    fn adc(&mut self, mode: &AddressingModes) {
+        let (data, page_crossed) = self.get_data(mode);
+
+        self.__add(data);
 
         if page_crossed {
             self.cycles += 1;
@@ -282,8 +366,8 @@ impl CPU {
         self.flags.negative = self.a >> 7 == 1;
 
         if page_crossed {
-            self.cycles += 1
-        };
+            self.cycles += 1;
+        }
     }
 
     fn asl(&mut self, mode: &AddressingModes) {
@@ -390,7 +474,7 @@ impl CPU {
 
         self.flags.carry = self.a >= data;
         self.flags.zero = self.a == data;
-        self.flags.negative = self.a.overflowing_sub(data).1;
+        self.flags.negative = (self.a.wrapping_sub(data)) >> 7 == 1;
 
         if page_crossed {
             self.cycles += 1;
@@ -402,7 +486,7 @@ impl CPU {
 
         self.flags.carry = self.x >= data;
         self.flags.zero = self.x == data;
-        self.flags.negative = self.x.overflowing_sub(data).1;
+        self.flags.negative = (self.x.wrapping_sub(data)) >> 7 == 1;
     }
     
     fn cpy(&mut self, mode: &AddressingModes) {
@@ -410,7 +494,7 @@ impl CPU {
 
         self.flags.carry = self.y >= data;
         self.flags.zero = self.y == data;
-        self.flags.negative = self.y.overflowing_sub(data).1;
+        self.flags.negative = (self.y.wrapping_sub(data)) >> 7 == 1;
     }
 
     fn dec(&mut self, mode: &AddressingModes) {
@@ -535,7 +619,10 @@ impl CPU {
         }
     }
 
-    fn nop(&mut self, _mode: &AddressingModes) {
+    fn nop(&mut self, mode: &AddressingModes) {
+        if (*mode != AddressingModes::Implicit) && self.get_operand_addr(mode).1 {
+            self.cycles += 1;
+        }
     }
 
     fn ora(&mut self, mode: &AddressingModes) {
@@ -646,20 +733,12 @@ impl CPU {
 
     fn sbc(&mut self, mode: &AddressingModes) {
         let (data, page_crossed) = self.get_data(mode);
-        
-        let orig_sign = self.a >> 7;
-        let carry1: bool;
-        let carry2: bool;
-        (self.a, carry1) = self.a.overflowing_sub(data);
-        (self.a, carry2) = self.a.overflowing_sub(self.flags.carry as u8);
-        self.flags.carry = carry1 || carry2;
-        self.flags.zero = self.a == 0;
-        self.flags.overflow = (orig_sign == data >> 7) && (orig_sign != self.a >> 7);
-        self.flags.negative = self.a >> 7 == 1;
+
+        self.__add(data ^ 0xff);
 
         if page_crossed {
-            self.cycles += 1
-        };
+            self.cycles += 1;
+        }
     }
 
     fn sec(&mut self, _mode: &AddressingModes) {
@@ -779,7 +858,7 @@ impl CPU {
 
         self.flags.carry = self.a >= data;
         self.flags.zero = self.a == data;
-        self.flags.negative = self.a.overflowing_sub(data).1;
+        self.flags.negative = (self.a.wrapping_sub(data)) >> 7 == 1;
     }
 
     fn isc(&mut self, mode: &AddressingModes) {
@@ -787,15 +866,7 @@ impl CPU {
         let data = self.read_mem(addr).wrapping_add(1);
         self.write_mem(addr, data);
 
-        let orig_sign = self.a >> 7;
-        let carry1: bool;
-        let carry2: bool;
-        (self.a, carry1) = self.a.overflowing_sub(data);
-        (self.a, carry2) = self.a.overflowing_sub(self.flags.carry as u8);
-        self.flags.carry = carry1 || carry2;
-        self.flags.zero = self.a == 0;
-        self.flags.overflow = (orig_sign == data >> 7) && (orig_sign != self.a >> 7);
-        self.flags.negative = self.a >> 7 == 1;
+        self.__add(data ^ 0xff);
     }
 
     fn las(&mut self, mode: &AddressingModes) {
@@ -845,13 +916,93 @@ impl CPU {
             res |= 0b00000001;
         }
         self.write_mem(addr, res);
-        self.a &= data;
+        self.a &= res;
         
         self.flags.zero = self.a == 0;
         self.flags.negative = self.a >> 7 == 1;
     }
 
     fn rra(&mut self, mode: &AddressingModes) {
-        todo!();
+        let addr = self.get_operand_addr(mode).0;
+        let bit7 = self.flags.carry;
+        let data = self.read_mem(addr);
+        self.flags.carry = data & 1 == 1;
+        let mut res = data >> 1;
+        if bit7 {
+            res  |= 0b10000000;
+        }
+        self.write_mem(addr, res);
+
+        self.__add(res);
     }
+
+    fn sax(&mut self, mode: &AddressingModes) {
+        let addr = self.get_operand_addr(mode).0;
+        self.write_mem(addr, self.a & self.x);
+    }
+
+    fn sbx(&mut self, mode: &AddressingModes) {
+        let data = self.get_data(mode).0;
+        let temp = self.a & self.x;
+        self.x = temp.wrapping_sub(data);
+
+        self.flags.carry = temp >= data;
+        self.flags.zero = self.x == 0;
+        self.flags.negative = self.x >> 7 == 1;
+    }
+
+    fn sha(&mut self, mode: &AddressingModes) {
+        let addr = self.get_operand_addr(mode).0;
+        self.write_mem(addr, self.a & self.x & ((addr >> 4) as u8).wrapping_add(1));
+    }
+
+    fn shx(&mut self, mode: &AddressingModes) {
+        let addr = self.get_operand_addr(mode).0;
+        self.write_mem(addr, self.x & ((addr >> 4) as u8).wrapping_add(1));
+    }
+
+    fn shy(&mut self, mode: &AddressingModes) {
+        let addr = self.get_operand_addr(mode).0;
+        self.write_mem(addr, self.y & ((addr >> 4) as u8).wrapping_add(1));
+    }
+
+    fn slo(&mut self, mode: &AddressingModes) {
+        let addr = self.get_operand_addr(mode).0;
+        let data = self.read_mem(addr);
+        self.write_mem(addr, data << 1);
+
+        self.a = self.a | (data << 1);
+
+        self.flags.carry = data >> 7 == 1;
+        self.flags.zero = self.a == 0;
+        self.flags.negative = self.a >> 7 == 1;
+    }
+
+    fn sre(&mut self, mode: &AddressingModes) {
+        let addr = self.get_operand_addr(mode).0;
+        let data = self.read_mem(addr);
+        self.write_mem(addr, data >> 1);
+
+        self.a = self.a ^ (data >> 1);
+
+        self.flags.carry = data & 1 == 1;
+        self.flags.zero = self.a == 0;
+        self.flags.negative = self.a >> 7 == 1;
+    }
+
+    fn tas(&mut self, mode: &AddressingModes) {
+        self.sp = self.a & self.x;
+        let addr = self.get_operand_addr(mode).0;
+        self.write_mem(addr, self.a & self.x & ((addr >> 4) as u8).wrapping_add(1));
+    }
+
+    // usbc@0xeb == sbc@0xe9
+
+    // nop@0x1a, 0x3a, 0x5a, 0x7a, 0xda, 0xfa, 0x80, 0x82, 0x89, 0xc2, 0xe2, 0x04, 0x44, 0x64,
+    //  0x14, 0x34, 0x54, 0x74, 0xd4, 0xf4, 0x0c, 0x1c, 0x3c, 0x5c, 0x7c, 0xdc, 0xfc == nop@0xea
+
+    fn jam(&mut self, _mode: &AddressingModes) {
+        panic!("CPU jammed!")
+    }
+
 }
